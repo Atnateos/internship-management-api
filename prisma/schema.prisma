@@ -1,0 +1,30 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Applicant {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  phone     String?
+  track     String    // Frontend Development, Backend Development, Mobile Development, UI/UX Design, Data Analytics
+  status    String    @default("Pending") // Pending, Shortlisted, Accepted, Rejected
+  notes     String?   // Max 1000 characters
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
