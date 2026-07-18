@@ -60,7 +60,7 @@ describe('ApplicantsService', () => {
         name: 'Jane Doe',
         email: 'jane.doe@example.com',
         track: InternshipTrack.BACKEND,
-      } as any;
+      };
 
       const result = await service.create(dto);
 
@@ -76,7 +76,7 @@ describe('ApplicantsService', () => {
           name: 'Someone Else',
           email: 'jane.doe@example.com',
           track: InternshipTrack.BACKEND,
-        } as any),
+        }),
       ).rejects.toThrow(ConflictException);
 
       expect(prisma.applicant.create).not.toHaveBeenCalled();
@@ -88,7 +88,7 @@ describe('ApplicantsService', () => {
       prisma.applicant.count.mockResolvedValue(0);
       prisma.applicant.findMany.mockResolvedValue([]);
 
-      await service.findAll({ page: 1, limit: 10, sortBy: 'createdAt', sortOrder: 'desc' } as any);
+      await service.findAll({ page: 1, limit: 10, sortBy: 'createdAt', sortOrder: 'desc' });
 
       expect(prisma.applicant.count).toHaveBeenCalledWith({
         where: expect.objectContaining({ deletedAt: null }),
@@ -109,7 +109,7 @@ describe('ApplicantsService', () => {
         limit: 10,
         sortBy: 'createdAt',
         sortOrder: 'desc',
-      } as any);
+      });
 
       expect(result.meta).toEqual({ total: 25, page: 2, limit: 10, totalPages: 3 });
     });
@@ -139,7 +139,7 @@ describe('ApplicantsService', () => {
       prisma.applicant.findFirst.mockResolvedValue(baseApplicant);
       prisma.applicant.update.mockResolvedValue({ ...baseApplicant, name: 'Jane D.' });
 
-      const result = await service.update('applicant-1', { name: 'Jane D.' } as any);
+      const result = await service.update('applicant-1', { name: 'Jane D.' });
 
       expect(result.name).toBe('Jane D.');
       expect(prisma.applicant.findUnique).not.toHaveBeenCalled();
@@ -150,7 +150,7 @@ describe('ApplicantsService', () => {
       prisma.applicant.findUnique.mockResolvedValue({ ...baseApplicant, id: 'someone-else' });
 
       await expect(
-        service.update('applicant-1', { email: 'taken@example.com' } as any),
+        service.update('applicant-1', { email: 'taken@example.com' }),
       ).rejects.toThrow(ConflictException);
     });
 
@@ -158,7 +158,7 @@ describe('ApplicantsService', () => {
       prisma.applicant.findFirst.mockResolvedValue(baseApplicant);
       prisma.applicant.update.mockResolvedValue(baseApplicant);
 
-      await service.update('applicant-1', { email: baseApplicant.email } as any);
+      await service.update('applicant-1', { email: baseApplicant.email });
 
       expect(prisma.applicant.findUnique).not.toHaveBeenCalled();
     });
@@ -174,7 +174,7 @@ describe('ApplicantsService', () => {
 
       const result = await service.updateStatus('applicant-1', {
         status: ApplicantStatus.SHORTLISTED,
-      } as any);
+      });
 
       expect(result.status).toBe(ApplicantStatus.SHORTLISTED);
     });
@@ -186,7 +186,7 @@ describe('ApplicantsService', () => {
       });
 
       await expect(
-        service.updateStatus('applicant-1', { status: ApplicantStatus.ACCEPTED } as any),
+        service.updateStatus('applicant-1', { status: ApplicantStatus.ACCEPTED }),
       ).rejects.toThrow(BadRequestException);
 
       expect(prisma.applicant.update).not.toHaveBeenCalled();
@@ -204,7 +204,7 @@ describe('ApplicantsService', () => {
 
       const result = await service.updateStatus('applicant-1', {
         status: ApplicantStatus.PENDING,
-      } as any);
+      });
 
       expect(result.status).toBe(ApplicantStatus.PENDING);
     });
@@ -215,7 +215,7 @@ describe('ApplicantsService', () => {
       prisma.applicant.findFirst.mockResolvedValue(baseApplicant);
       prisma.applicant.update.mockResolvedValue({ ...baseApplicant, notes: 'Great candidate' });
 
-      const result = await service.updateNotes('applicant-1', { notes: 'Great candidate' } as any);
+      const result = await service.updateNotes('applicant-1', { notes: 'Great candidate' });
 
       expect(result.notes).toBe('Great candidate');
     });
@@ -224,7 +224,7 @@ describe('ApplicantsService', () => {
       prisma.applicant.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.updateNotes('missing-id', { notes: 'test' } as any),
+        service.updateNotes('missing-id', { notes: 'test' }),
       ).rejects.toThrow(NotFoundException);
     });
   });
