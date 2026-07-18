@@ -1,7 +1,10 @@
-import { IsOptional, IsString, IsEnum, IsInt, Min, Max } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsInt, IsIn, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ApplicantStatus, InternshipTrack } from '../constants/applicant.constants';
+
+const SORTABLE_FIELDS = ['name', 'email', 'status', 'track', 'createdAt', 'updatedAt'] as const;
+type SortableField = (typeof SORTABLE_FIELDS)[number];
 
 export class QueryApplicantDto {
   @ApiPropertyOptional({ description: 'Search term for name or email' })
@@ -34,13 +37,13 @@ export class QueryApplicantDto {
   @IsOptional()
   limit?: number = 10;
 
-  @ApiPropertyOptional({ default: 'createdAt' })
-  @IsString()
+  @ApiPropertyOptional({ enum: SORTABLE_FIELDS, default: 'createdAt' })
+  @IsIn(SORTABLE_FIELDS)
   @IsOptional()
-  sortBy?: string = 'createdAt';
+  sortBy?: SortableField = 'createdAt';
 
   @ApiPropertyOptional({ default: 'desc', enum: ['asc', 'desc'] })
-  @IsString()
+  @IsIn(['asc', 'desc'])
   @IsOptional()
   sortOrder?: 'asc' | 'desc' = 'desc';
 }
