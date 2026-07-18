@@ -11,19 +11,23 @@ import { ApplicantStatus } from './constants/applicant.constants';
 export class ApplicantsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createApplicantDto: CreateApplicantDto) {
+async create(createApplicantDto: CreateApplicantDto) {
+    // Normalize here too (in addition to the DTO-level @Transform) so the
+    // uniqueness check and stored value are consistent even if this method
+    // is ever called from somewhere other than the HTTP validation pipeline.
+    const email = createApplicantDto.email.toLowerCase().trim();
+
     const existing = await this.prisma.applicant.findUnique({
-      where: { email: createApplicantDto.email },
+      where: { email },
     });
     if (existing) {
       throw new ConflictException('Applicant with this email already exists');
     }
 
     return this.prisma.applicant.create({
-      data: createApplicantDto,
+      data: { ...createApplicantDto, email },
     });
   }
-
   async findAll(query: QueryApplicantDto) {
     const { search, status, track, page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = query;
     const skip = (page - 1) * limit;
@@ -83,9 +87,11 @@ export class ApplicantsService {
   async update(id: string, updateApplicantDto: UpdateApplicantDto) {
     const applicant = await this.findOne(id);
 
-    if (updateApplicantDto.email && updateApplicantDto.email !== applicant.email) {
+    const email = updateApplicantDto.email?.toLowerCase().trim();
+
+    if (email && email !== applicant.email) {
       const emailConflict = await this.prisma.applicant.findUnique({
-        where: { email: updateApplicantDto.email },
+        where: { email },
       });
       if (emailConflict) {
         throw new ConflictException('Applicant with this email already exists');
@@ -94,10 +100,9 @@ export class ApplicantsService {
 
     return this.prisma.applicant.update({
       where: { id },
-      data: updateApplicantDto,
+      data: { ...updateApplicantDto, ...(email && { email }) },
     });
   }
-
   async updateStatus(id: string, updateStatusDto: UpdateStatusDto) {
     const applicant = await this.findOne(id);
     const newStatus = updateStatusDto.status;

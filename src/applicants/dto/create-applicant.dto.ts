@@ -1,4 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { InternshipTrack, ApplicantStatus } from '../constants/applicant.constants';
 
@@ -9,6 +10,9 @@ export class CreateApplicantDto {
   name!: string;
 
   @ApiProperty({ example: 'john.doe@example.com' })
+  // Normalize casing/whitespace before validation and before it ever reaches
+  // the database, so "A@x.com" and "a@x.com" are treated as the same address.
+  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase().trim() : value))
   @IsEmail()
   email!: string;
 
