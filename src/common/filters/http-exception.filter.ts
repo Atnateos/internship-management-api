@@ -1,4 +1,11 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { Prisma } from '@prisma/client';
 
@@ -16,7 +23,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const res = exception.getResponse();
-      body = typeof res === 'string' ? { message: res } : (res as Record<string, unknown>);
+      body =
+        typeof res === 'string'
+          ? { message: res }
+          : (res as Record<string, unknown>);
     } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       // Known, expected database error codes get a clean, specific response.
       // Anything else falls through to a generic 400 rather than exposing

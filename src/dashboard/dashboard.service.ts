@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { ApplicantStatus, InternshipTrack } from '../applicants/constants/applicant.constants';
+import {
+  ApplicantStatus,
+  InternshipTrack,
+} from '../applicants/constants/applicant.constants';
 
 @Injectable()
 export class DashboardService {
@@ -23,18 +26,31 @@ export class DashboardService {
       }),
     ]);
 
-    // Construct response metrics by mapping database groups to our defined enums
-    const statusDistribution = Object.values(ApplicantStatus).reduce((acc, status) => {
-      const match = statusGroups.find((g) => g.status === status);
-      acc[status] = match ? match._count.status : 0;
-      return acc;
-    }, {} as Record<string, number>);
+    // Construct response metrics by mapping database groups to our defined enums.
+    // g.status/g.track come back from Prisma as plain strings (SQLite doesn't
+    // support native Prisma enums), so they're cast here for a type-safe
+    // comparison against our own TypeScript enums.
+    const statusDistribution = Object.values(ApplicantStatus).reduce(
+      (acc, status) => {
+        const match = statusGroups.find(
+          (g) => (g.status as ApplicantStatus) === status,
+        );
+        acc[status] = match ? match._count.status : 0;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const trackDistribution = Object.values(InternshipTrack).reduce((acc, track) => {
-      const match = trackGroups.find((g) => g.track === track);
-      acc[track] = match ? match._count.track : 0;
-      return acc;
-    }, {} as Record<string, number>);
+    const trackDistribution = Object.values(InternshipTrack).reduce(
+      (acc, track) => {
+        const match = trackGroups.find(
+          (g) => (g.track as InternshipTrack) === track,
+        );
+        acc[track] = match ? match._count.track : 0;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       totalApplicants: total,

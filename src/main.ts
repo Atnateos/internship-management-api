@@ -11,7 +11,7 @@ async function bootstrap() {
 
   // Enable Cross-Origin Resource Sharing (CORS)
   app.enableCors();
-  
+
   // Set up global validation for incoming requests
   app.useGlobalPipes(
     new ValidationPipe({
@@ -27,7 +27,9 @@ async function bootstrap() {
   // Configure Swagger API Documentation
   const config = new DocumentBuilder()
     .setTitle('INFNOVA Internship Applicant Management API')
-    .setDescription('Administrative API documentation for managing internship candidates.')
+    .setDescription(
+      'Administrative API documentation for managing internship candidates.',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -40,4 +42,7 @@ async function bootstrap() {
   console.log(`Application successfully running on port ${port}`);
   console.log(`Open API Docs available at: http://localhost:${port}/api/docs`);
 }
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Failed to start application:', error);
+  process.exit(1);
+});

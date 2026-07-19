@@ -17,7 +17,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         // so there is no insecure fallback here by design.
         secret: config.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: config.get<string>('JWT_EXPIRES_IN', '1d') as `${number}${'s' | 'm' | 'h' | 'd'}` | number,
+          expiresIn: config.get<string>('JWT_EXPIRES_IN', '1d') as
+            `${number}${'s' | 'm' | 'h' | 'd'}` | number,
         },
       }),
     }),

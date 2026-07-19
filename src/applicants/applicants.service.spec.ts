@@ -1,8 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ApplicantsService } from './applicants.service';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { ApplicantStatus, InternshipTrack } from './constants/applicant.constants';
+import {
+  ApplicantStatus,
+  InternshipTrack,
+} from './constants/applicant.constants';
 
 describe('ApplicantsService', () => {
   let service: ApplicantsService;
@@ -43,7 +50,10 @@ describe('ApplicantsService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ApplicantsService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        ApplicantsService,
+        { provide: PrismaService, useValue: prisma },
+      ],
     }).compile();
 
     service = module.get<ApplicantsService>(ApplicantsService);
@@ -88,7 +98,12 @@ describe('ApplicantsService', () => {
       prisma.applicant.count.mockResolvedValue(0);
       prisma.applicant.findMany.mockResolvedValue([]);
 
-      await service.findAll({ page: 1, limit: 10, sortBy: 'createdAt', sortOrder: 'desc' });
+      await service.findAll({
+        page: 1,
+        limit: 10,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      });
 
       expect(prisma.applicant.count).toHaveBeenCalledWith({
         where: expect.objectContaining({ deletedAt: null }),
@@ -111,7 +126,12 @@ describe('ApplicantsService', () => {
         sortOrder: 'desc',
       });
 
-      expect(result.meta).toEqual({ total: 25, page: 2, limit: 10, totalPages: 3 });
+      expect(result.meta).toEqual({
+        total: 25,
+        page: 2,
+        limit: 10,
+        totalPages: 3,
+      });
     });
   });
 
@@ -130,14 +150,19 @@ describe('ApplicantsService', () => {
     it('throws NotFoundException when the applicant does not exist or is soft-deleted', async () => {
       prisma.applicant.findFirst.mockResolvedValue(null);
 
-      await expect(service.findOne('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('update', () => {
     it('allows updating profile fields without touching email', async () => {
       prisma.applicant.findFirst.mockResolvedValue(baseApplicant);
-      prisma.applicant.update.mockResolvedValue({ ...baseApplicant, name: 'Jane D.' });
+      prisma.applicant.update.mockResolvedValue({
+        ...baseApplicant,
+        name: 'Jane D.',
+      });
 
       const result = await service.update('applicant-1', { name: 'Jane D.' });
 
@@ -147,7 +172,10 @@ describe('ApplicantsService', () => {
 
     it('throws ConflictException when updating to an email already used by another applicant', async () => {
       prisma.applicant.findFirst.mockResolvedValue(baseApplicant);
-      prisma.applicant.findUnique.mockResolvedValue({ ...baseApplicant, id: 'someone-else' });
+      prisma.applicant.findUnique.mockResolvedValue({
+        ...baseApplicant,
+        id: 'someone-else',
+      });
 
       await expect(
         service.update('applicant-1', { email: 'taken@example.com' }),
@@ -186,7 +214,9 @@ describe('ApplicantsService', () => {
       });
 
       await expect(
-        service.updateStatus('applicant-1', { status: ApplicantStatus.ACCEPTED }),
+        service.updateStatus('applicant-1', {
+          status: ApplicantStatus.ACCEPTED,
+        }),
       ).rejects.toThrow(BadRequestException);
 
       expect(prisma.applicant.update).not.toHaveBeenCalled();
@@ -213,9 +243,14 @@ describe('ApplicantsService', () => {
   describe('updateNotes', () => {
     it('updates notes for an existing applicant', async () => {
       prisma.applicant.findFirst.mockResolvedValue(baseApplicant);
-      prisma.applicant.update.mockResolvedValue({ ...baseApplicant, notes: 'Great candidate' });
+      prisma.applicant.update.mockResolvedValue({
+        ...baseApplicant,
+        notes: 'Great candidate',
+      });
 
-      const result = await service.updateNotes('applicant-1', { notes: 'Great candidate' });
+      const result = await service.updateNotes('applicant-1', {
+        notes: 'Great candidate',
+      });
 
       expect(result.notes).toBe('Great candidate');
     });
@@ -232,7 +267,10 @@ describe('ApplicantsService', () => {
   describe('remove', () => {
     it('soft-deletes by setting deletedAt instead of removing the row', async () => {
       prisma.applicant.findFirst.mockResolvedValue(baseApplicant);
-      prisma.applicant.update.mockResolvedValue({ ...baseApplicant, deletedAt: new Date() });
+      prisma.applicant.update.mockResolvedValue({
+        ...baseApplicant,
+        deletedAt: new Date(),
+      });
 
       await service.remove('applicant-1');
 
@@ -245,7 +283,9 @@ describe('ApplicantsService', () => {
     it('throws NotFoundException when the applicant is already deleted or missing', async () => {
       prisma.applicant.findFirst.mockResolvedValue(null);
 
-      await expect(service.remove('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.remove('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

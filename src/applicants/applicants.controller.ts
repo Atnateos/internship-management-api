@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApplicantsService } from './applicants.service';
 import { CreateApplicantDto } from './dto/create-applicant.dto';
 import { UpdateApplicantDto } from './dto/update-applicant.dto';
@@ -35,13 +45,19 @@ export class ApplicantsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update applicant metadata' })
-  update(@Param('id') id: string, @Body() updateApplicantDto: UpdateApplicantDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateApplicantDto: UpdateApplicantDto,
+  ) {
     return this.applicantsService.update(id, updateApplicantDto);
   }
 
   @Patch(':id/status')
   @ApiOperation({ summary: 'Update candidate track status' })
-  updateStatus(@Param('id') id: string, @Body() updateStatusDto: UpdateStatusDto) {
+  updateStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: UpdateStatusDto,
+  ) {
     return this.applicantsService.updateStatus(id, updateStatusDto);
   }
 

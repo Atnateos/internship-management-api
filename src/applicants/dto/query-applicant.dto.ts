@@ -1,9 +1,27 @@
-import { IsOptional, IsString, IsEnum, IsInt, IsIn, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsEnum,
+  IsInt,
+  IsIn,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { ApplicantStatus, InternshipTrack } from '../constants/applicant.constants';
+import {
+  ApplicantStatus,
+  InternshipTrack,
+} from '../constants/applicant.constants';
 
-const SORTABLE_FIELDS = ['name', 'email', 'status', 'track', 'createdAt', 'updatedAt'] as const;
+const SORTABLE_FIELDS = [
+  'name',
+  'email',
+  'status',
+  'track',
+  'createdAt',
+  'updatedAt',
+] as const;
 type SortableField = (typeof SORTABLE_FIELDS)[number];
 
 export class QueryApplicantDto {

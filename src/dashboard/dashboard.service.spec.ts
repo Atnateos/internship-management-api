@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DashboardService } from './dashboard.service';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { ApplicantStatus, InternshipTrack } from '../applicants/constants/applicant.constants';
+import {
+  ApplicantStatus,
+  InternshipTrack,
+} from '../applicants/constants/applicant.constants';
 
 describe('DashboardService', () => {
   let service: DashboardService;
@@ -21,7 +24,10 @@ describe('DashboardService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [DashboardService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        DashboardService,
+        { provide: PrismaService, useValue: prisma },
+      ],
     }).compile();
 
     service = module.get<DashboardService>(DashboardService);
@@ -35,7 +41,9 @@ describe('DashboardService', () => {
 
     await service.getSummary();
 
-    expect(prisma.applicant.count).toHaveBeenCalledWith({ where: { deletedAt: null } });
+    expect(prisma.applicant.count).toHaveBeenCalledWith({
+      where: { deletedAt: null },
+    });
     expect(prisma.applicant.groupBy).toHaveBeenCalledWith(
       expect.objectContaining({ where: { deletedAt: null } }),
     );
@@ -44,8 +52,12 @@ describe('DashboardService', () => {
   it('defaults every status and track to 0 when there is no data for them', async () => {
     prisma.applicant.count.mockResolvedValue(1);
     prisma.applicant.groupBy
-      .mockResolvedValueOnce([{ status: ApplicantStatus.PENDING, _count: { status: 1 } }])
-      .mockResolvedValueOnce([{ track: InternshipTrack.BACKEND, _count: { track: 1 } }]);
+      .mockResolvedValueOnce([
+        { status: ApplicantStatus.PENDING, _count: { status: 1 } },
+      ])
+      .mockResolvedValueOnce([
+        { track: InternshipTrack.BACKEND, _count: { track: 1 } },
+      ]);
 
     const result = await service.getSummary();
 

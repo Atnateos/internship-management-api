@@ -1,5 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import { CreateApplicantDto } from './dto/create-applicant.dto';
 import { UpdateApplicantDto } from './dto/update-applicant.dto';
 import { QueryApplicantDto } from './dto/query-applicant.dto';
@@ -11,7 +17,7 @@ import { ApplicantStatus } from './constants/applicant.constants';
 export class ApplicantsService {
   constructor(private prisma: PrismaService) {}
 
-async create(createApplicantDto: CreateApplicantDto) {
+  async create(createApplicantDto: CreateApplicantDto) {
     // Normalize here too (in addition to the DTO-level @Transform) so the
     // uniqueness check and stored value are consistent even if this method
     // is ever called from somewhere other than the HTTP validation pipeline.
@@ -29,10 +35,18 @@ async create(createApplicantDto: CreateApplicantDto) {
     });
   }
   async findAll(query: QueryApplicantDto) {
-    const { search, status, track, page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+    const {
+      search,
+      status,
+      track,
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: Prisma.ApplicantWhereInput = {
       deletedAt: null, // Exclude soft-deleted records
     };
 
@@ -108,8 +122,16 @@ async create(createApplicantDto: CreateApplicantDto) {
     const newStatus = updateStatusDto.status;
 
     // Rule: Cannot transition from Rejected directly to Accepted
-    if (applicant.status === ApplicantStatus.REJECTED && newStatus === ApplicantStatus.ACCEPTED) {
-      throw new BadRequestException('An applicant cannot move directly from Rejected to Accepted');
+    // (applicant.status comes back from Prisma as a plain string, since
+    // SQLite doesn't support native Prisma enums see README architecture
+    // notes so it's cast here for a type-safe comparison.)
+    if (
+      (applicant.status as ApplicantStatus) === ApplicantStatus.REJECTED &&
+      newStatus === ApplicantStatus.ACCEPTED
+    ) {
+      throw new BadRequestException(
+        'An applicant cannot move directly from Rejected to Accepted',
+      );
     }
 
     return this.prisma.applicant.update({

@@ -5,5 +5,5 @@ import { ApplicantStatus } from '../constants/applicant.constants';
 export class UpdateStatusDto {
   @ApiProperty({ enum: ApplicantStatus, example: ApplicantStatus.SHORTLISTED })
   @IsEnum(ApplicantStatus)
-  status!: string;
+  status!: ApplicantStatus;
 }

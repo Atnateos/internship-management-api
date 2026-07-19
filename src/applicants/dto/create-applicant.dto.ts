@@ -1,7 +1,17 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { InternshipTrack, ApplicantStatus } from '../constants/applicant.constants';
+import {
+  InternshipTrack,
+  ApplicantStatus,
+} from '../constants/applicant.constants';
 
 export class CreateApplicantDto {
   @ApiProperty({ example: 'John Doe' })
@@ -12,7 +22,9 @@ export class CreateApplicantDto {
   @ApiProperty({ example: 'john.doe@example.com' })
   // Normalize casing/whitespace before validation and before it ever reaches
   // the database, so "A@x.com" and "a@x.com" are treated as the same address.
-  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase().trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.toLowerCase().trim() : value,
+  )
   @IsEmail()
   email!: string;
 
@@ -25,12 +37,18 @@ export class CreateApplicantDto {
   @IsEnum(InternshipTrack)
   track!: string;
 
-  @ApiPropertyOptional({ enum: ApplicantStatus, default: ApplicantStatus.PENDING })
+  @ApiPropertyOptional({
+    enum: ApplicantStatus,
+    default: ApplicantStatus.PENDING,
+  })
   @IsEnum(ApplicantStatus)
   @IsOptional()
   status?: string;
 
-  @ApiPropertyOptional({ example: 'Solid understanding of Node.js.', maxLength: 1000 })
+  @ApiPropertyOptional({
+    example: 'Solid understanding of Node.js.',
+    maxLength: 1000,
+  })
   @IsString()
   @IsOptional()
   @MaxLength(1000)

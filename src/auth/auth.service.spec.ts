@@ -39,7 +39,10 @@ describe('AuthService', () => {
   describe('login', () => {
     it('returns an access token and user profile for valid credentials', async () => {
       const hashed = await bcrypt.hash('correct-password', 10);
-      prisma.user.findUnique.mockResolvedValue({ ...mockUser, password: hashed });
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        password: hashed,
+      });
 
       const result = await service.login({
         email: 'admin@infnova.com',
@@ -60,7 +63,10 @@ describe('AuthService', () => {
 
     it('never returns the password hash in the response', async () => {
       const hashed = await bcrypt.hash('correct-password', 10);
-      prisma.user.findUnique.mockResolvedValue({ ...mockUser, password: hashed });
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        password: hashed,
+      });
 
       const result = await service.login({
         email: 'admin@infnova.com',
@@ -80,10 +86,16 @@ describe('AuthService', () => {
 
     it('throws UnauthorizedException when the password is wrong', async () => {
       const hashed = await bcrypt.hash('correct-password', 10);
-      prisma.user.findUnique.mockResolvedValue({ ...mockUser, password: hashed });
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        password: hashed,
+      });
 
       await expect(
-        service.login({ email: 'admin@infnova.com', password: 'wrong-password' }),
+        service.login({
+          email: 'admin@infnova.com',
+          password: 'wrong-password',
+        }),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
